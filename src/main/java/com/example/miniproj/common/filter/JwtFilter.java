@@ -5,10 +5,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.List;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -85,19 +89,31 @@ public class JwtFilter implements Filter{
         String authHeader = req.getHeader("Authorization");
         System.out.println(">>>> JwtFilter Authorization : "+authHeader);
         if( authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println(">>>> JwtFilter Not Authorization : ");
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            System.out.println(">>>> JwtFilter No Authorization Header - Proceeding without authentication");
+            chain.doFilter(request, response);
             return ;
         }
         String token = authHeader.substring(7);
         System.out.println(">>>> JwtFilter token : "+token); 
         System.out.println(">>>> JwtFilter token validation check "); 
         try {
-            Jwts.parserBuilder()
+            // Token Validation & Claims Extraction
+            Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token) ;
-            System.out.println(">>>> JwtFilter token validation success move to ctrl ");     
+                .parseClaimsJws(token)
+                .getBody();
+
+            String email = claims.getSubject();
+            System.out.println(">>>> JwtFilter token validation success. User: " + email);
+
+            // Create Authentication Token (Roles can be extracted from claims if available)
+            UsernamePasswordAuthenticationToken authentication = 
+                new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+            // Set Security Context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            
             chain.doFilter(request, response);
 
         } catch(Exception e) {
