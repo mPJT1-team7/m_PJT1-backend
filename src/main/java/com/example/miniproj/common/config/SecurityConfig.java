@@ -29,9 +29,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/users/signUp", "/users/signIn").permitAll()
+                        .requestMatchers("/user/signup", "/user/signin").permitAll()
                         .requestMatchers("/test/generate-token").permitAll()
-                        .requestMatchers("/v1/health/**").permitAll()
+                        .requestMatchers("/v1/health/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

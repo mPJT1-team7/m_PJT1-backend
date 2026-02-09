@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "Security Test", description = "Endpoints for testing Security and JWT")
+@Tag(name = "Security Test", description = "Security and JWT Test")
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class SecurityTestController {
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
-    @Operation(summary = "Generate Token", description = "Generates an Access Token and Refresh Token for testing.")
+    @Operation(summary = "Generate Token", description = "액세스 토큰 생성 테스트")
     @GetMapping("/generate-token")
     public String generateToken(@RequestParam String email) {
         String accessToken = jwtProvider.createAT(email);
@@ -33,7 +33,7 @@ public class SecurityTestController {
         return "Access Token: " + accessToken;
     }
 
-    @Operation(summary = "Test Secured Endpoint", description = "Tests access to a secured endpoint. Requires Bearer Token.")
+    @Operation(summary = "Test Secured Endpoint", description = "토큰 인증 테스트")
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/secured")
     public String secured() {

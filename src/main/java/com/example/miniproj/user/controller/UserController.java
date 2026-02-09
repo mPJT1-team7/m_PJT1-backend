@@ -54,7 +54,7 @@ public class UserController {
         UserResponseDTO response = userService.signin(request);
         System.out.println(">>> User Controller signin response: " + response);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/password")
