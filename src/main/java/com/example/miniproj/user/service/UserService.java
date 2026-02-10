@@ -2,6 +2,8 @@ package com.example.miniproj.user.service;
 
 import org.springframework.stereotype.Service;
 
+import com.example.miniproj.common.service.RefreshTokenService;
+import com.example.miniproj.common.util.JwtProvider;
 import com.example.miniproj.user.dao.UserRepository;
 import com.example.miniproj.user.domain.dto.UserPwdRequestDTO;
 import com.example.miniproj.user.domain.dto.UserRequestDTO;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public UserResponseDTO signup(UserRequestDTO request) {
         System.out.println(">>> User Service signup");
@@ -45,7 +49,19 @@ public class UserService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        return UserResponseDTO.fromEntity(user);
+        // 토큰 발급
+        String accessToken = jwtProvider.createAT(user.getEmail());
+        String refreshToken = jwtProvider.createRT(user.getEmail());
+
+        // Refresh Token 저장
+        refreshTokenService.saveToken(user.getEmail(), refreshToken);
+
+        return UserResponseDTO.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Transactional

@@ -8,22 +8,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Getter
 public class UserResponseDTO {
     private Integer userId;
-    String email;
-    String pwd;
+    private String email;
+    private String accessToken;
+    private String refreshToken;
 
     public static UserResponseDTO fromEntity(UserEntity entity) {
         return UserResponseDTO.builder()
                 .userId(entity.getUserId())
                 .email(entity.getEmail())
-                .pwd(entity.getPwd())
                 .build();
     }
-
 }
