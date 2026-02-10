@@ -10,5 +10,4 @@ public class MiniprojBeApplication {
 		SpringApplication.run(MiniprojBeApplication.class, args);
 	}
 
-}
-// alsrbs
+} // ffff
