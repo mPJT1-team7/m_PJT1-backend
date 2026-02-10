@@ -16,14 +16,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "interviews")
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class InterviewEntity {
 
     @Id
@@ -39,6 +40,6 @@ public class InterviewEntity {
     private LocalDate created_at;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "resumeId")
+    @JoinColumn(name = "resume_id")
     private ResumeEntity resume;
 }
