@@ -1,5 +1,6 @@
 package com.example.miniproj.user.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.miniproj.common.service.RefreshTokenService;
@@ -21,6 +22,12 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
+    // 회원가입 암호 해싱처리
+    private final PasswordEncoder passwordEncoder;
+
+    //
+    // private final TokenService tokenService;
+
     public UserResponseDTO signup(UserRequestDTO request) {
         System.out.println(">>> User Service signup");
 
@@ -29,8 +36,13 @@ public class UserService {
             throw new RuntimeException("이미 존재하는 사용자입니다.");
         }
 
+        UserEntity user = UserEntity.builder()
+                .email(request.getEmail())
+                .pwd(passwordEncoder.encode(request.getPwd()))
+                .build();
+
         // 새 사용자 저장
-        UserEntity savedUser = userRepository.save(request.toEntity());
+        UserEntity savedUser = userRepository.save(user);
 
         // DTO 변환 후 반환
         return UserResponseDTO.fromEntity(savedUser);
@@ -45,8 +57,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 비밀번호 확인
-        if (!user.getPwd().equals(request.getPwd())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        if (!passwordEncoder.matches(request.getPwd(), user.getPwd())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");
         }
 
         // 토큰 발급
@@ -73,13 +85,27 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 비밀번호 확인
-        if (!user.getPwd().equals(request.getPwd())) {
+        if (!passwordEncoder.matches(request.getPwd(), user.getPwd())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        user.setPwd(request.getNewPwd());
+        // 기존 비밀번호 != 새 비밀번호 확인
+        if (passwordEncoder.matches(request.getNewPwd(), user.getPwd())) {
+            throw new RuntimeException("기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.");
+        }
+
+        user.setPwd(passwordEncoder.encode(request.getNewPwd()));
 
         return UserResponseDTO.fromEntity(user);
+    }
+
+    @Transactional
+    public void logout(String email) {
+        System.out.println(">>> User Service logout");
+
+        refreshTokenService.deleteToken(email);
+
+        System.out.println(">>> UserService logout completed");
     }
 
 }

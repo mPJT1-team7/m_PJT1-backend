@@ -58,23 +58,28 @@ public class UserController {
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<Void> password(
+    public ResponseEntity<String> password(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "사용자 비밀번호 변경", required = true, content = @Content(schema = @Schema(implementation = UserPwdRequestDTO.class))) @RequestBody UserPwdRequestDTO request) {
         System.out.println(">>> User Controller: /password");
         System.out.println(request);
 
-        userService.pwd(request);
-
-        return ResponseEntity.noContent().build();
+        try {
+            userService.pwd(request);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "사용자 로그아웃", required = true, content = @Content(schema = @Schema(implementation = UserRequestDTO.class))) @RequestBody String entity) {
+            @RequestBody UserRequestDTO request) {
 
         System.out.println(">>> User Controller: /logout");
 
-        return null;
+        userService.logout(request.getEmail());
+
+        return ResponseEntity.noContent().build();
     }
 
 }
