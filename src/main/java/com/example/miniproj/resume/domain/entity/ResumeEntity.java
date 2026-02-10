@@ -55,9 +55,10 @@ public class ResumeEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany(mappedBy = "resume")
+    // @OneToMany(mappedBy = "resume")
+    // private List<InterviewEntity> interview = new ArrayList<>();
+    @OneToMany(mappedBy = "resume", cascade = jakarta.persistence.CascadeType.REMOVE, orphanRemoval = true)
     private List<InterviewEntity> interview = new ArrayList<>();
-
 }
 
 /*
