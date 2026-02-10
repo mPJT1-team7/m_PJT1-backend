@@ -18,7 +18,7 @@ spring:
   jpa:
     hibernate: 
       # create, create-drop, update, none
-      ddl-auto: update
+      ddl-auto: none
       # 콘솔출력
     show-sql: true     
     properties:
