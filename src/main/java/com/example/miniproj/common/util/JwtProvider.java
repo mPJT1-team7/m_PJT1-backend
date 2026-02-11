@@ -54,8 +54,9 @@ public class JwtProvider {
         if(token.startsWith("Bearer ")) {
             token = token.substring(7) ;
         }
-        Claims claims = Jwts.parser()
+        Claims claims = Jwts.parserBuilder()
                             .setSigningKey(getStringKey())
+                            .build()
                             .parseClaimsJws(token)
                             .getBody() ; 
 
