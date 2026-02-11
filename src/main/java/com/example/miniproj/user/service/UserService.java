@@ -13,6 +13,8 @@ import com.example.miniproj.user.domain.entity.UserEntity;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import com.example.miniproj.common.exception.CustomException;
+import com.example.miniproj.common.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class UserService {
 
         // 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("이미 존재하는 사용자입니다.");
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         UserEntity user = UserEntity.builder()
@@ -54,11 +56,11 @@ public class UserService {
 
         // 사용자 조회
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPwd(), user.getPwd())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 토큰 발급
@@ -82,16 +84,16 @@ public class UserService {
 
         // 사용자 조회
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPwd(), user.getPwd())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 기존 비밀번호 != 새 비밀번호 확인
         if (passwordEncoder.matches(request.getNewPwd(), user.getPwd())) {
-            throw new RuntimeException("기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST);
         }
 
         user.setPwd(passwordEncoder.encode(request.getNewPwd()));

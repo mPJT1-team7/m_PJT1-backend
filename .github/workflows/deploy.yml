@@ -11,10 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 1. GitHub Actions 서버 내에서 빌드 (선택 사항)
-      # EC2의 부담을 줄이기 위해 여기서 빌드 후 파일을 보낼 수도 있지만, 
-      # 현재는 말씀하신 대로 EC2에서 직접 빌드하고 파일을 생성하는 방식으로 작성합니다.
-
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -22,24 +18,36 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}     # .pem 키 내용
           script: |
-            # 1. 프로젝트 폴더로 이동 (폴더명 'AI-Interview-Platform'은 본인 설정에 맞게 수정)
+            # 1. 프로젝트 폴더로 이동
             cd /home/${{ secrets.EC2_USERNAME }}/AI-Interview-Platform
             
-            # 2. 최신 코드 pull
-            git pull origin main
+            # 2. 모든 자바 프로세스 강제 종료 (좀비 프로세스 방어)
+            # 8080 포트를 잡고 있는 구버전 서버를 확실히 죽입니다.
+            sudo killall -9 java || true
+            sudo fuser -k 8080/tcp || true
             
-            # 3. GitHub Secrets에 저장된 설정값으로 파일 덮어쓰기
-            # 레포에 올라간 코드가 아니라 Secrets에 등록한 진짜 Redis 정보 등이 들어갑니다.
+            # 3. Git 강제 동기화
+            # 서버 내부의 꼬인 설정 무시하고 깃허브 최신 코드로 강제 덮어쓰기 합니다.
+            git fetch --all
+            git reset --hard origin/main
+            
+            # 4. 기존 빌드 결과물 싹 지우기
+            # 옛날 JAR 파일이 실행되는 것을 원천 차단합니다.
+            rm -rf build
+            
+            # 5. GitHub Secrets 설정값으로 파일 생성
             echo "${{ secrets.DEV_YML }}" > ./src/main/resources/application-dev.yml
             echo "${{ secrets.ENV_FILE }}" > .env
             
-            # 4. Gradle 빌드 (테스트는 제외하고 빌드 속도 향상)
+            # 6. .env 파일의 변수들을 시스템 환경변수로 주입
+            if [ -f .env ]; then
+              export $(grep -v '^#' .env | xargs)
+            fi
+            
+            # 7. Gradle 빌드
             chmod +x gradlew
             ./gradlew clean build -x test
             
-            # 5. 기존 8080 포트 프로세스 종료 (실행 중이 아니어도 오류 무시)
-            sudo fuser -k 8080/tcp || true
-            
-            # 6. 새 JAR 파일 실행 (dev 프로필 적용)
-            # 빌드 결과물 중 -plain.jar를 제외한 진짜 실행 파일을 찾아 실행합니다.
+            # 8. 새 JAR 파일 실행 (dev 프로필 적용)
+            # 빌드된 결과물 중 실행 가능한 JAR를 찾아 배경에서 실행합니다.
             nohup java -jar -Dspring.profiles.active=dev build/libs/*[^plain].jar > app.log 2>&1 &
