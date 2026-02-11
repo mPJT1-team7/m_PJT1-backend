@@ -28,14 +28,14 @@ dependencies {
    //swagger api + springboot 3.x
    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
-   //redis
-   // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
    //.env 이용한 보안 필요 정보를 저장, github x
    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
-   //spring security
-   // implementation 'org.springframework.boot:spring-boot-starter-security'
+	//spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
    //ai lib
    implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -44,19 +44,25 @@ dependencies {
    //json lib
    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-   //default 7
-   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-   implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-   implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
-   compileOnly 'org.projectlombok:lombok'
-   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-   runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-   annotationProcessor 'org.projectlombok:lombok'
-   testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-   testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-   testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.1'
-   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	//default 7
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 }
 
 tasks.named('test') {
