@@ -10,6 +10,7 @@ import com.example.miniproj.resume.dao.ResumeRepository;
 import com.example.miniproj.resume.domain.dto.ResumeBookmarkRequestDTO;
 import com.example.miniproj.resume.domain.dto.ResumeProgressRequestDTO;
 import com.example.miniproj.resume.domain.dto.ResumeResponseDTO;
+import com.example.miniproj.resume.domain.dto.ResumeTitleRequestDTO;
 import com.example.miniproj.resume.domain.entity.ResumeEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,19 @@ public class ResumeService {
         resumeRepository.save(entity);
     }
 
+    // @Transactional
+    // public void updateProgress(
+    //     ResumeProgressRequestDTO dto, String userEmail) {
+
+    //     ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
+    //         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
+    //     if (!entity.getUser().getEmail().equals(userEmail)) {
+    //         throw new RuntimeException("해당 자소서의 소유자가 아닙니다.");
+    //     }
+    //     entity.setProgress(dto.getProgress());
+    //     resumeRepository.save(entity);
+    // }
+
     // MyPage Resume Delete API
     @Transactional
     public void deleteResume(Integer resumeId) {
@@ -60,5 +74,15 @@ public class ResumeService {
         ResumeEntity entity = resumeRepository.findById(resumeId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + resumeId));
         resumeRepository.deleteById(entity.getResumeId());
+    }
+
+    // MyPage Resume Title Update API
+    @Transactional
+    public void updateTitle(ResumeTitleRequestDTO dto) {
+
+        ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
+        entity.setTitle(dto.getTitle());
+        resumeRepository.save(entity);
     }
 }

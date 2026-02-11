@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResumeProgressRequestDTO {
+public class ResumeTitleRequestDTO {
     private Integer resumeId;
-    private String progress;
+    private String title;
 }

@@ -52,7 +52,7 @@ public class ResumeEntity {
     private String progress;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private UserEntity user;
 
     // @OneToMany(mappedBy = "resume")

@@ -40,6 +40,6 @@ public class InterviewEntity {
     private LocalDate created_at;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "resume_id")
+    @JoinColumn(name = "resumeId")
     private ResumeEntity resume;
 }

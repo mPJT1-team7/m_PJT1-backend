@@ -1,0 +1,45 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ] # main 브랜치에 push될 때마다 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 1. GitHub Actions 서버 내에서 빌드 (선택 사항)
+      # EC2의 부담을 줄이기 위해 여기서 빌드 후 파일을 보낼 수도 있지만, 
+      # 현재는 말씀하신 대로 EC2에서 직접 빌드하고 파일을 생성하는 방식으로 작성합니다.
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}      # 탄력적 IP
+          username: ${{ secrets.EC2_USERNAME }} # ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}     # .pem 키 내용
+          script: |
+            # 1. 프로젝트 폴더로 이동 (폴더명 'AI-Interview-Platform'은 본인 설정에 맞게 수정)
+            cd /home/${{ secrets.EC2_USERNAME }}/AI-Interview-Platform
+            
+            # 2. 최신 코드 pull
+            git pull origin main
+            
+            # 3. GitHub Secrets에 저장된 설정값으로 파일 덮어쓰기
+            # 레포에 올라간 코드가 아니라 Secrets에 등록한 진짜 Redis 정보 등이 들어갑니다.
+            echo "${{ secrets.DEV_YML }}" > ./src/main/resources/application-dev.yml
+            echo "${{ secrets.ENV_FILE }}" > .env
+            
+            # 4. Gradle 빌드 (테스트는 제외하고 빌드 속도 향상)
+            chmod +x gradlew
+            ./gradlew clean build -x test
+            
+            # 5. 기존 8080 포트 프로세스 종료 (실행 중이 아니어도 오류 무시)
+            sudo fuser -k 8080/tcp || true
+            
+            # 6. 새 JAR 파일 실행 (dev 프로필 적용)
+            # 빌드 결과물 중 -plain.jar를 제외한 진짜 실행 파일을 찾아 실행합니다.
+            nohup java -jar -Dspring.profiles.active=dev build/libs/*[^plain].jar > app.log 2>&1 &
