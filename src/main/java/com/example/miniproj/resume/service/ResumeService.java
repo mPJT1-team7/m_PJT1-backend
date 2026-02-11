@@ -12,76 +12,80 @@ import com.example.miniproj.resume.domain.dto.ResumeProgressRequestDTO;
 import com.example.miniproj.resume.domain.dto.ResumeResponseDTO;
 import com.example.miniproj.resume.domain.dto.ResumeTitleRequestDTO;
 import com.example.miniproj.resume.domain.entity.ResumeEntity;
+import com.example.miniproj.user.dao.UserRepository;
+import com.example.miniproj.user.domain.entity.UserEntity;
 
 import lombok.RequiredArgsConstructor;
-
 
 @Service
 @RequiredArgsConstructor
 public class ResumeService {
 
     private final ResumeRepository resumeRepository;
+    private final UserRepository userRepository;
 
     // MyPage List Read API
-    public List<ResumeResponseDTO> getMyResumeList(Integer userId) {
-
-        List<ResumeEntity> entities = resumeRepository.findByUser_UserId((userId));
+    public List<ResumeResponseDTO> getMyResumeList(Integer userId, String email) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        
+        if (!user.getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 자소서 목록을 조회할 권한이 없습니다.");
+        }
+        List<ResumeEntity> entities = resumeRepository.findByUser_UserId(userId);
         return entities.stream()
-                .map(entity -> {
-                    ResumeResponseDTO response = ResumeResponseDTO.fromEntity(entity);
-                    return response;
-                })
+                .map(ResumeResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
     // MyPage BookMark Update API
     @Transactional
-    public void updateBookmark(ResumeBookmarkRequestDTO dto) {
-
+    public void updateBookmark(
+        ResumeBookmarkRequestDTO dto, String email) {
         ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
+        
+        if (!entity.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 자소서를 수정할 권한이 없습니다.");
+        }
         entity.setBookmark(dto.isBookmark());
         resumeRepository.save(entity);
     }
 
     // MyPage Progress Update API
     @Transactional
-    public void updateProgress(ResumeProgressRequestDTO dto) {
+    public void updateProgress(ResumeProgressRequestDTO dto, String email) {
 
         ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
+        if (!entity.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 자소서를 수정할 권한이 없습니다.");
+        }
         entity.setProgress(dto.getProgress());
         resumeRepository.save(entity);
     }
 
-    // @Transactional
-    // public void updateProgress(
-    //     ResumeProgressRequestDTO dto, String userEmail) {
-
-    //     ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
-    //         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
-    //     if (!entity.getUser().getEmail().equals(userEmail)) {
-    //         throw new RuntimeException("해당 자소서의 소유자가 아닙니다.");
-    //     }
-    //     entity.setProgress(dto.getProgress());
-    //     resumeRepository.save(entity);
-    // }
-
     // MyPage Resume Delete API
     @Transactional
-    public void deleteResume(Integer resumeId) {
+    public void deleteResume(Integer resumeId, String email) {
 
         ResumeEntity entity = resumeRepository.findById(resumeId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + resumeId));
+        if (!entity.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 자소서를 삭제할 권한이 없습니다.");
+        }
         resumeRepository.deleteById(entity.getResumeId());
     }
 
     // MyPage Resume Title Update API
     @Transactional
-    public void updateTitle(ResumeTitleRequestDTO dto) {
+    public void updateTitle(ResumeTitleRequestDTO dto, String email) {
 
         ResumeEntity entity = resumeRepository.findById(dto.getResumeId())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 자소서입니다. id=" + dto.getResumeId()));
+        if (!entity.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 자소서를 수정할 권한이 없습니다.");
+        }
         entity.setTitle(dto.getTitle());
         resumeRepository.save(entity);
     }

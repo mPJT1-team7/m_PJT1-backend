@@ -20,30 +20,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
 
 @RestController
-@RequestMapping("/api/resumes")
+@RequestMapping("/resume")
 @RequiredArgsConstructor
 public class ResumeController {
     private final ResumeService resumeService;
 
     // MyPage List Read API
-    @GetMapping
-    public ResponseEntity<List<ResumeResponseDTO>> getMyResumes(@RequestParam Integer userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<ResumeResponseDTO>> getMyResumes(
+        @PathVariable Integer userId,
+        Authentication authentication) {
 
-        List<ResumeResponseDTO> list = resumeService.getMyResumeList(userId);        
-        return ResponseEntity.ok(list); // Return to "200, LIST"
+        try {
+            List<ResumeResponseDTO> list = resumeService.getMyResumeList(userId, authentication.getName());
+            return ResponseEntity.ok(list); // Return to "200, LIST"
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ArrayList<>());
+        }
     }
 
     // MyPage BookMark Update API
     @PutMapping("/bookmark")
-    public ResponseEntity<?> updateBookmark(@RequestBody ResumeBookmarkRequestDTO dto) {
+    public ResponseEntity<?> updateBookmark(
+        @RequestBody ResumeBookmarkRequestDTO dto,
+        Authentication authentication) {
 
         try {
-            resumeService.updateBookmark(dto);
+            resumeService.updateBookmark(dto, authentication.getName());
             return ResponseEntity.ok("즐겨찾기 상태가 변경되었습니다.");    // Return to "200, MESSAGE"
         }
         catch (IllegalArgumentException e) {
@@ -53,10 +63,12 @@ public class ResumeController {
 
     // MyPage Progress Update API
     @PutMapping("/progress")
-    public ResponseEntity<?> updateProgress(@RequestBody ResumeProgressRequestDTO dto) {
-
+    public ResponseEntity<?> updateProgress(
+        @RequestBody ResumeProgressRequestDTO dto,
+        Authentication authentication) {
+            
         try {
-            resumeService.updateProgress(dto);
+            resumeService.updateProgress(dto, authentication.getName());
             return ResponseEntity.ok("진행 상태가 변경되었습니다.");    // Return to "200, MESSAGE"
         }
         catch (IllegalArgumentException e) {
@@ -64,27 +76,13 @@ public class ResumeController {
         }
     }
 
-    // @PutMapping("/progress")
-    // public ResponseEntity<?> updateProgress(
-    //     @RequestBody ResumeProgressRequestDTO dto,
-    //     Authentication authentication
-    // ) {
-
-    //     try {
-    //         String userEmail = authentication.getName();
-    //         resumeService.updateProgress(dto, userEmail);
-    //         return ResponseEntity.ok("진행 상태가 변경되었습니다.");    // Return to "200, MESSAGE"
-    //     }
-    //     catch (RuntimeException e) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    //     }
-    // }
-
     // MyPage Resume Delete API
     @DeleteMapping("/delete/{resumeId}")
-    public ResponseEntity<?> deleteResume(@PathVariable Integer resumeId) {
+    public ResponseEntity<?> deleteResume(
+        @PathVariable Integer resumeId,
+        Authentication authentication) {
         try {
-            resumeService.deleteResume(resumeId);
+            resumeService.deleteResume(resumeId, authentication.getName());
             return ResponseEntity.ok("자소서가 삭제되었습니다.");   // Return to "200, MESSAGE"
         }
         catch (IllegalArgumentException e) {
@@ -94,9 +92,11 @@ public class ResumeController {
 
     // MyPage Resume Title Update API
     @PatchMapping("/title")
-    public ResponseEntity<?> updateTitle(@RequestBody ResumeTitleRequestDTO dto) {
+    public ResponseEntity<?> updateTitle(
+        @RequestBody ResumeTitleRequestDTO dto,
+        Authentication authentication) {
         try {
-            resumeService.updateTitle(dto);
+            resumeService.updateTitle(dto, authentication.getName());
             return ResponseEntity.ok("자소서 제목이 변경되었습니다.");
         }
         catch (IllegalArgumentException e) {
