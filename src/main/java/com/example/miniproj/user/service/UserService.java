@@ -95,6 +95,7 @@ public class UserService {
         }
 
         user.setPwd(passwordEncoder.encode(request.getNewPwd()));
+        logout(user.getEmail());
 
         return UserResponseDTO.fromEntity(user);
     }
