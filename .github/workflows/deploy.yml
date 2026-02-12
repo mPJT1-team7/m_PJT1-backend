@@ -47,4 +47,9 @@ jobs:
             ./gradlew clean build -x test
             
             # 8. 새 JAR 파일 실행 
-            nohup /usr/bin/java -jar -Dspring.profiles.active=dev build/libs/*[^plain].jar > /home/${{ secrets.EC2_USERNAME }}/app.log 2>&1 &
+            nohup /usr/bin/java -jar \
+              -Dspring.profiles.active=dev \
+              -DOPEN_AI_KEY="${{ secrets.OPEN_AI_KEY }}" \
+              -DOPEN_AI_MODEL="${{ secrets.OPEN_AI_MODEL }}" \
+              -DOPEN_AI_URL="${{ secrets.OPEN_AI_URL }}" \
+              build/libs/*[^plain].jar > /home/${{ secrets.EC2_USERNAME }}/app.log 2>&1 &
