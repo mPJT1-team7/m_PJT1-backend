@@ -73,7 +73,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @RequestBody UserRequestDTO request) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "사용자 로그아웃", required = true, content = @Content(schema = @Schema(implementation = UserRequestDTO.class))) @RequestBody UserRequestDTO request) {
 
         System.out.println(">>> User Controller: /logout");
 
