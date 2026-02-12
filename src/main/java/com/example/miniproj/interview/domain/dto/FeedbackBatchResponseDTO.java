@@ -13,6 +13,7 @@ public class FeedbackBatchResponseDTO {
     private String progress;
     private List<FeedbackItem> feedbacks;
     private String category;
+    private Boolean answerState;
 
     @Getter
     @Builder
