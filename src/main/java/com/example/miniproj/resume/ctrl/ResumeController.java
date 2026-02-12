@@ -2,6 +2,7 @@ package com.example.miniproj.resume.ctrl;
 
 import com.example.miniproj.resume.domain.dto.ResumeBookmarkRequestDTO;
 import com.example.miniproj.resume.domain.dto.ResumeProgressRequestDTO;
+import com.example.miniproj.resume.domain.dto.ResumeReminderResponseDTO;
 import com.example.miniproj.resume.domain.dto.ResumeResponseDTO;
 import com.example.miniproj.resume.domain.dto.ResumeTitleRequestDTO;
 import com.example.miniproj.resume.service.ResumeService;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -102,5 +102,19 @@ public class ResumeController {
         catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/popup/{userId}")
+    public ResponseEntity<ResumeReminderResponseDTO> getReminderPopup(
+            @PathVariable("userId") Integer userId, 
+            Authentication auth) {
+        
+        ResumeReminderResponseDTO reminder = resumeService.getRandomReminder(userId, auth.getName());
+        
+        if (reminder == null) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(reminder);
     }
 }

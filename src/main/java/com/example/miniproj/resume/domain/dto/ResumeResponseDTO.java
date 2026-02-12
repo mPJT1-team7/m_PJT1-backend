@@ -14,12 +14,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResumeResponseDTO {
-private Integer resumeId;
+    private Integer resumeId;
     private String title;
     private String category;
     private String progress;
     private boolean bookmark;
     private LocalDate createdAt;
+    private boolean answerState;
+    private String userEmail;
 
     public static ResumeResponseDTO fromEntity(ResumeEntity entity) {
         return ResumeResponseDTO.builder()
@@ -29,6 +31,8 @@ private Integer resumeId;
                 .progress(entity.getProgress())
                 .bookmark(entity.isBookmark())
                 .createdAt(entity.getCreated_at())
+                .answerState(entity.isAnswer_state())
+                .userEmail(entity.getUser().getEmail())
                 .build();
     }
 }

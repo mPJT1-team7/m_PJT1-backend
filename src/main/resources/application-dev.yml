@@ -65,3 +65,8 @@ logging:
     com.example.miniproj: DEBUG  # 본인의 패키지 경로로 수정
     org.hibernate.SQL: DEBUG     # DB 쿼리를 직접 확인
     org.springframework.security: DEBUG # 시큐리티 문제 확인
+
+openai:
+  key: ${OPEN_AI_KEY}
+  model: ${OPEN_AI_MODEL}
+  url: ${OPEN_AI_URL}
