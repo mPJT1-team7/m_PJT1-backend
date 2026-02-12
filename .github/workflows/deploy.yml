@@ -34,18 +34,11 @@ jobs:
             rm -rf build
             
             # 5. GitHub Secrets 설정값으로 파일 생성
-            # 시크릿에 이미 변수들을 다 넣어두셨으니 이 단계가 중요합니다.
             echo "${{ secrets.DEV_YML }}" > ./src/main/resources/application-dev.yml
-            echo "${{ secrets.ENV_FILE }}" > .env
             
-            # 6. .env 파일의 변수들을 시스템 환경변수로 주입
-            if [ -f .env ]; then
-              export $(grep -v '^#' .env | xargs)
-            fi
-            
-            # 7. Gradle 빌드
+            # 6. Gradle 빌드
             chmod +x gradlew
             ./gradlew clean build -x test
             
-            # 8. 새 JAR 파일 실행 
+            # 7. 새 JAR 파일 실행 
             nohup /usr/bin/java -jar -Dspring.profiles.active=dev build/libs/*[^plain].jar > /home/${{ secrets.EC2_USERNAME }}/app.log 2>&1 &
