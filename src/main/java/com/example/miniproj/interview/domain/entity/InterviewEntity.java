@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.miniproj.resume.domain.entity.ResumeEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,8 @@ public class InterviewEntity {
 
     private String question;
     private String answer;
+
+    @Column(columnDefinition = "TEXT")
     private String feedback;
     // 질문 만족도 (0~5)
     private int level;
