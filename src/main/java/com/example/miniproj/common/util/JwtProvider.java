@@ -18,7 +18,7 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String secret ; 
 
-    private final long ACCESS_TOKEN_EXPIRY  = 1000L * 60 * 30 ;
+    private final long ACCESS_TOKEN_EXPIRY  = 1000L * 60 * 60 ;
     private final long REFRESH_TOKEN_EXPIRY = 1000L * 60 * 60 * 24 * 7 ;
 
     private Key getStringKey() {

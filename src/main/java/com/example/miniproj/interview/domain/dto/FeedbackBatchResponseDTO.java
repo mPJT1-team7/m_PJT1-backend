@@ -12,6 +12,7 @@ public class FeedbackBatchResponseDTO {
     private String title;
     private String progress;
     private List<FeedbackItem> feedbacks;
+    private String category;
 
     @Getter
     @Builder
