@@ -53,7 +53,7 @@ public class InterviewService {
                     .resume(resume)
                     .question(q)
                     .level(0)
-                    .created_at(LocalDate.now())    // 필요없지 않나
+                    .created_at(LocalDate.now())
                     .build());
             dtos.add(QuestionResponseDTO.builder()
                 .interviewId(
