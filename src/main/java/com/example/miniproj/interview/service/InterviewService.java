@@ -134,6 +134,7 @@ public class InterviewService {
                 .title(resume.getTitle())
                 .progress(resume.getProgress())
                 .feedbacks(feedbackItems)
+                .category(resume.getCategory())
                 .build();
     }
 

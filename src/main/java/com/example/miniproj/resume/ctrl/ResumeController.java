@@ -39,7 +39,8 @@ public class ResumeController {
     // MyPage List Read API
     @GetMapping("/{userId}")
     public ResponseEntity<List<ResumeResponseDTO>> getMyResumes(
-            @Parameter(description = "사용자 자기소개서 전체 조회", required = true) @PathVariable Integer userId,
+            @Parameter(description = "사용자 자기소개서 전체 조회", required = true) 
+            @PathVariable("userId") Integer userId, // <--- ("userId") 추가
             Authentication authentication) {
 
         try {
@@ -81,7 +82,8 @@ public class ResumeController {
     // MyPage Resume Delete API
     @DeleteMapping("/delete/{resumeId}")
     public ResponseEntity<?> deleteResume(
-            @Parameter(description = "자기소개서 삭제", required = true) @PathVariable Integer resumeId,
+            @Parameter(description = "자기소개서 삭제", required = true) 
+            @PathVariable("resumeId") Integer resumeId, // <--- ("resumeId") 추가
             Authentication authentication) {
         try {
             resumeService.deleteResume(resumeId, authentication.getName());
